@@ -7,28 +7,30 @@
 '''
 from renderEngine.ApplicationBase import ApplicationBase
 from taxon_home.views.pagelets.public.NavBarPagelet import NavBarPagelet
-from taxon_home.views.pagelets.public.HomePagelet import HomePagelet
+from taxon_home.views.pagelets.public.RegisterPagelet import RegisterPagelet
 from taxon_home.views.pagelets.public.FooterPagelet import FooterPagelet
 
+
 class Application(ApplicationBase):
+	
+	
 	def doProcessRender(self, request):
-		self.login_value = 1
-                self.message = ''
+		
+		self.is_register_page = 1
+	
 		args = {
-			'title' : 'Homepage'
-		}
+			'title' : 'Register'
+		}	
 		self.setApplicationLayout('public/base.html', args)
 		self.addPageletBinding('navBar', NavBarPagelet(addHelpButton=True))
-		navbarPagelet = NavBarPagelet()
-                navbarPagelet.login_links(self.login_value)
-                navbarPagelet.login_messages(self.message)
-		self.addPageletBinding('navBar',navbarPagelet)
-		self.addPageletBinding('center-1', HomePagelet())
-		self.addPageletBinding('footer', FooterPagelet())
-		
+		navbarpagelet = NavBarPagelet()
+		navbarpagelet.register(self.is_register_page)	
+		self.addPageletBinding('navBar', navbarpagelet)
+		self.addPageletBinding('center-1', RegisterPagelet())
+		self.addPageletBinding('footer',FooterPagelet())
 '''
 	Used for mapping to the url in urls.py
-'''        	
+'''	 
+#@csrf_exempt	   
 def renderAction(request):
 	return Application().render(request)
-

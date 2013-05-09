@@ -1,0 +1,58 @@
+import taxon_home.views.util.ErrorConstants as Errors
+from django.contrib.auth.models import User
+from django.core.exceptions import ObjectDoesNotExist
+from renderEngine.WebServiceObject import WebServiceObject
+
+class GetAPI:
+    
+    def __init__(self, user=None, fields=None):
+        self.user = user
+        self.fields = fields
+    
+    '''
+        Gets all the tags in the database that are private
+    '''
+    def getUser(self, userName, isKey=True):
+        metadata = WebServiceObject()
+        
+        try:            
+            if (isKey):
+                user = User.objects.get(username=userName)
+            else:
+                user = userName
+        except (ObjectDoesNotExist, ValueError):
+            raise Errors.INVALID_USER_NAME
+        except Exception:
+            raise Errors.INTERNAL_ERROR
+        
+        metadata.limitFields(self.fields)
+
+        metadata.put('Status', 'Success! Following contains the required information')
+        metadata.put('firstname', user.first_name)
+        metadata.put('lastname', user.last_name)
+        metadata.put('username', user.username)
+        metadata.put('email', user.email)
+        metadata.put('is_active', user.is_active)
+
+        '''
+        
+        
+        if metadata.allowsField('points'):
+            tagPoints = TagPoint.objects.filter(tag__exact=tag)
+            
+            points = []
+            
+            for tagPoint in tagPoints:
+                points.append({
+                    'x' : tagPoint.pointX, 
+                    'y' : tagPoint.pointY
+                })
+            
+            metadata.put('points', points)
+        
+        metadata.put('id', tag.pk)
+        metadata.put('color', [tag.color.red, tag.color.green, tag.color.blue])
+        metadata.put('description', tag.description)
+        
+        '''
+        return metadata

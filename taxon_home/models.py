@@ -5,10 +5,20 @@
 from django.db import models
 from django.contrib.auth.models import User
 from datetime import datetime
+import os
 
 # Receive the pre_delete signal and delete the file associated with the model instance.
 from django.db.models.signals import pre_delete
 from django.dispatch.dispatcher import receiver
+
+class UserProfile(models.Model):
+    user = models.ForeignKey(User, unique=True)
+    activation_key = models.CharField(max_length=200)
+    affiliation = models.CharField(max_length=200)
+    auth_token = models.CharField(max_length=200)
+    def __unicode__(self):
+        return self.user.username
+
 
 class Picture(models.Model):
     description = models.TextField(blank=True, null=True)

@@ -1,0 +1,123 @@
+<head>
+
+<script language="javascript" type="text/javascript">
+function validateForm()
+{
+var x=document.forms["register"]["firstname"].value;
+if (x==null || x=="")
+  {
+  alert("First name must be filled out");
+  return false;
+  }
+var letters = /^[A-Za-z]+$/;  
+if(! x.match(letters))  
+  { 
+  alert('Firstname must include characters only');
+  return false;
+  }
+var y=document.forms["register"]["lastname"].value;
+if (y==null || y=="")
+  {
+  alert("Last name must be filled out");
+  return false;
+  }
+if(! y.match(letters))  
+  { 
+  alert('Lastname must include characters only');
+  return false;
+  }
+var z=document.forms["register"]["username"].value;
+if (z==null || z=="")
+  {
+  alert("User name must be filled out");
+  return false;
+  }
+var b=document.forms["register"]["password"].value;
+if (b==null || b=="")
+  {
+  alert("Password must be filled out");
+  return false;
+  }
+
+var a = document.forms["register"]["email"].value;
+var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;  
+if(! a.match(mailformat))  
+  {   
+  alert("You have entered an invalid email address!");    
+  return false;  
+  } 
+
+var c = document.forms["register"]["cpassword"].value;
+if (b != c) 
+  {
+  alert("Your password and confirmation password do not match.");
+  return false; 
+  }
+
+}
+</script>
+</head>
+
+
+<body>
+<h3><span style="color:red">{{error_message}}</span></h3>
+<form name="Login" method="post" action="{{ SITE_URL }}login/">
+    <div class="login_search">
+        <table>                 
+            <tbody>
+                <tr>
+                    <td id="login_header">Sign In</td></tr>
+                    <tr><td class="login_title">Username</td>
+                    <td><input class="login_text" type="text" name="username" size="18"></td>
+                </tr>
+                <tr>
+                    <td class="login_title">Password</td>
+                    <td><input class="login_text" type="password" name="password" size="18"></td>
+                </tr>
+                <tr>
+                    <td class="passReset"><a href="{{ SITE_URL }}resetPassword/">Forgot Password</a></td>
+                </tr>
+                <tr>
+                    <td><input class="submit_button" id="login_submit" type="submit" name="submit" value="Login"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+ </form>
+ <form name="register" method="post" action="{{ SITE_URL }}login/" onsubmit="return validateForm()">
+    <div class="registration">
+        <table>                 
+            <tbody>
+                <tr>
+                    <td id="registration_header">Register</td>
+                </tr>
+                <tr> 
+                    <td class="register_title">First Name</td><td><input class="register_text" type="text" name="firstname" size="18"></td>
+                </tr>
+                <tr>
+                    <td class="register_title">Last Name</td><td><input class="register_text" type="text" name="lastname" size="18"></td>
+                </tr>
+		</tr>
+                <tr>
+                    <td class="register_title">Affiliation</td><td><input class="register_text" type="text" name="affiliation" size="18"></td>
+                </tr>
+                <tr>
+                    <td class="register_title">Username</td><td><input class="register_text" type="text" name="username" size="18"></td>
+                </tr>
+                <tr>
+                    <td class="register_title">Password</td><td><input class="register_text" type="password" name="password" size="18"></td>
+                </tr>
+                <tr>
+                    <td class="register_title">Confirm Password</td><td><input class="register_text" type="password" name="cpassword" size="18"></td>
+                </tr>
+                <tr>
+                    <td class="register_title">Email</td><td><input class="register_text" type="text" name="email" size="20"></td>
+                </tr>
+                <tr>
+                    <td><input class="submit_button" id="login_submit" type="submit" name="submit" value="Submit"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</form>
+</body>

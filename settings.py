@@ -94,7 +94,7 @@ PAGELET_LAYOUT_DIR = 'pageletLayouts/'
 APPLICATION_LAYOUT_DIR = 'applicationLayouts/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'MAKE A UNIQUE KEY HERE'
+SECRET_KEY = 'uxr6s8ve!(px^@7a96xom&f2^(lj+z#i3e)r#hwk486v$x(0lb'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -170,3 +170,8 @@ RATE_LIMIT = False # Set to false to disable rate limiting
 TIMEOUT = 1 # number of minutes before cache timeout
 MAX_REQUESTS = 100 # number of request allowed before cache timeout
 
+EMAIL_HOST          = 'smtp.gmail.com'
+EMAIL_PORT          = 587
+EMAIL_HOST_USER     = 'rajeswari284@gmail.com'
+EMAIL_HOST_PASSWORD = 'b4uonly$123'
+EMAIL_USE_TLS       = True

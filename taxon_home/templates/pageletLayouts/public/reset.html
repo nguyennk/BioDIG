@@ -1,0 +1,23 @@
+<body>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <h4><span style="color:red;text-align:center">{{ message }}</span></h4>
+    {% endfor %}
+</ul>
+{% endif %}
+<form name="Login" method="post" action="{{ SITE_URL }}resetPassword/">
+    <div align="center">
+        <table>                 
+            <tbody>
+                    <tr><td class="login_title">Email Address</td>
+                    <td><input class="login_text" type="text" name="email" size="20"></td>
+                </tr>
+                <tr>
+                    <td><input class="submit_button" id="login_submit" type="submit" name="submit" value="Submit"></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+ </form>
+</body>

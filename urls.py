@@ -19,8 +19,13 @@ urlpatterns = patterns('taxon_home.views.applications.public',
     url(r'^genome_browser/$', 'GBrowse.Application.renderAction'),
     url(r'^blast/$', 'Blast.Application.renderAction'),
     #url(r'^blast/submit/$', 'mycoplasma_home.views.submit_blast'),
-    url(r'^login_handler/$', 'Login.Application.renderAction'),
+    #url(r'^login_handler/$', 'Login.Application.renderAction'),
+    url(r'^login/$', 'Login.Application.renderAction'),
     url(r'^logout_handler/$', 'Logout.Application.renderAction'),
+    url(r'^register/$', 'Register.Application.renderAction'),
+    url(r'^resetPassword/$', 'ResetPassword.Application.renderAction'),
+    url(r'^changePassword/$', 'ChangePassword.Application.renderAction'),
+    url(r'^activate/$', 'ActivateUser.Application.renderAction'),
     url(r'^search/$', 'Search.Application.renderAction'),
     url(r'^advancedSearch/$', 'AdvancedSearch.Application.renderAction')
 )
@@ -36,7 +41,8 @@ urlpatterns += patterns('taxon_home.views.webServices',
     url(r'^api/aggregate/tagGroups$', 'AggregateTagGroups.Application.renderAction'),
     url(r'^api/aggregate/tagGroups/search$', 'AggregateTagGroupsSearch.Application.renderAction'),
     url(r'^api/images/search$', 'SearchImages.Application.renderAction'),
-    url(r'^api/organisms/search$', 'SearchOrganisms.Application.renderAction')
+    url(r'^api/organisms/search$', 'SearchOrganisms.Application.renderAction'),
+    url(r'^api/users$', 'Users.Application.renderAction'),
 )
 
 urlpatterns += patterns('taxon_home.views.applications.registered',
