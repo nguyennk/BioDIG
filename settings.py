@@ -13,10 +13,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': 'chado',
-        'USER': 'mycoplasma',
-        'PASSWORD': '5i72c44u',
-        'HOST': '',
-        'PORT': '',
+        'USER': 'tomoyasulab',
+        'PASSWORD': 'beetles',
+        'HOST': 'localhost',
+        'PORT': '5433',
     }
 }
 
@@ -64,12 +64,12 @@ STATIC_ROOT = '/var/www/BioDIG/static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = SITE_URL + 'static_site/'
+STATIC_URL = SITE_URL + 'static/'
 
 # URL prefix for admin static files -- CSS, JavaScript and images.
 # Make sure to use a trailing slash.
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
-ADMIN_MEDIA_PREFIX = SITE_URL + 'static/admin/'
+#ADMIN_MEDIA_PREFIX = SITE_URL + 'static/admin/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
@@ -94,7 +94,7 @@ PAGELET_LAYOUT_DIR = 'pageletLayouts/'
 APPLICATION_LAYOUT_DIR = 'applicationLayouts/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'MAKE A UNIQUE KEY HERE'
+SECRET_KEY = 'qwi&%^FDYI8y171huI&YS&&@TEOIS('
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (

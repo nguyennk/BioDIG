@@ -54,6 +54,6 @@ urlpatterns += patterns('taxon_home.views.applications.admin',
 urlpatterns += patterns('', 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^media/(?P<path>.*)$', 'taxon_home.views.applications.public.Media.Application.renderAction', {'document_root': settings.MEDIA_ROOT}),
-    url(r'^static_site/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATICFILES_DIRS[0]}),
-    url(r'^static/admin/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/usr/local/lib/python2.6/dist-packages/django/contrib/admin/media'}),
+    #url(r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATICFILES_DIRS[0]}),
+    #url(r'^static/admin/(?P<path>.*)$', 'django.views.static.serve', {'document_root': '/usr/local/lib/python2.7/dist-packages/django/contrib/admin/media'}),
 )
