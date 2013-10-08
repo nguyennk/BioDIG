@@ -37,20 +37,29 @@ def getDelimitedList(queryDict, key, delimiter=','):
     return value
 
 def getFilterByDate(dateString, paramName):
-    action, dates = (item.strip() for item in dateString.split(':', 1))
+    action_dates = [item.strip() for item in dateString.split(':', 1)]
+    
+    action = action_dates[0]
+    dates = action_dates[1] if len(action_dates) > 1 else action
     
     try:
         if action == 'after':
-            date = datetime.strptime(dates, "%Y-%m-%d %H:%M:%S")
-            return paramName + '__gt', date
+            return paramName + '__gt', parseDate(dates)
         elif action == 'before':
-            date = datetime.strptime(dates, "%Y-%m-%d %H:%M:%S")
-            return paramName + '__lt', date
+            return paramName + '__lt', parseDate(dates)
         elif action == 'range':
-            first, second = (datetime.strptime(item, "%Y-%m-%d %H:%M:%S") for item in dates.split(',', 1))
-            return paramName + '__range', [first, second]
+            dates = [item.strip() for item in dates.split(',', 1)]
+            for i, date in enumerate(dates):
+                dates[i] = parseDate(date)
+            return paramName + '__range', dates
         else: # on keyword or no keyword
-            date = datetime.strptime(dates, "%Y-%m-%d %H:%M:%S")
-            return paramName, date
+            return paramName, parseDate(action + ':' + dates)
     except ValueError:
-        raise Errors.INVALID_SYNTAX.setCustom(paramName)       
+        raise Errors.INVALID_SYNTAX.setCustom(paramName)
+    
+def parseDate(dateString):
+    date_time = dateString.split(' ', 1)
+    if len(date_time) < 2:
+        date_time.append("00:00:00")
+    date = datetime.strptime(date_time[0] + " " + date_time[1], "%Y-%m-%d %H:%M:%S")
+    return date
