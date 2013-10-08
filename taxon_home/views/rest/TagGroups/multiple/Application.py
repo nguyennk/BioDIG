@@ -16,13 +16,9 @@ class Application(WebServiceApplicationBase):
 		renderObj = WebServiceObject()
 		try:
 			if request.method == "GET":
-				renderObj = API.getTagGroup(request)
+				renderObj = API.getTagGroups(request)
 			elif request.method == "POST":
 				renderObj = API.createTagGroup(request)
-			elif request.method == "PUT":
-				renderObj = API.updateTagGroup(request)
-			elif request.method == "DELETE":
-				renderObj = API.deleteTagGroup(request)
 			else:
 				renderObj.setError(Errors.INVALID_METHOD.setCustom(request.method))
 		except Errors.WebServiceException as e:

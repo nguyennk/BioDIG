@@ -13,11 +13,8 @@ class PostAPI:
     '''
         Creates a new tag with the given parameters
         
-        @param points: The points for a tag in an array of dictionaries
-            format: [{"x" : 256, "y" : 350}, ...]
-        @param description: The description for this tag
-        @param color: The color array for this tag
-            format: [r, g, b]
+        @param imageKey: The key for the image to which this tag group belongs
+        @param name: The description for this tag
     '''
     @transaction.commit_on_success 
     def createTagGroup(self, imageKey, name, isKey=True):

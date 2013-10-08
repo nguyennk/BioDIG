@@ -10,7 +10,7 @@ from delete import DeleteAPI
     @param request: Django Request object to be used to parse the query
     @param key: Numeric key for the tag group being asked for
 '''
-def getTagGroup(request, key):    
+def getTagGroup(request, key):
     # read in optional parameters and initialize the API
     fields = Util.getDelimitedList(request.GET, 'fields')
     getAPI = GetAPI(request.user, fields)
