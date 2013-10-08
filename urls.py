@@ -25,9 +25,19 @@ urlpatterns = patterns('taxon_home.views.applications.public',
     url(r'^advancedSearch/$', 'AdvancedSearch.Application.renderAction')
 )
 
+urlpatterns += patterns('taxon_home.views.rest',
+    # Tag Group API Urls
+    url(r'^api/tagGroups$', 'TagGroups.multiple.Application.renderAction'),
+    url(r'^api/tagGroups/(\d+)$', 'TagGroups.single.Application.renderAction'),               
+)
+
+'''
 urlpatterns += patterns('taxon_home.views.webServices',
+    # Tag API Urls
     url(r'^api/tags$', 'Tags.Application.renderAction'),
-    url(r'^api/tagGroups$', 'TagGroups.Application.renderAction'),
+    # Tag Group API Urls
+    url(r'^api/tagGroups$', 'TagGroups.multiple.Application.renderAction'),
+    url(r'^api/tagGroups$', 'TagGroups.multiple.Application.renderAction'),
     url(r'^api/geneLinks$', 'GeneLinks.Application.renderAction'),
     url(r'^api/images$', 'Images.Application.renderAction'),
     url(r'^api/geneLinks/search$', 'SearchGeneLinks.Application.renderAction'),
@@ -38,6 +48,7 @@ urlpatterns += patterns('taxon_home.views.webServices',
     url(r'^api/images/search$', 'SearchImages.Application.renderAction'),
     url(r'^api/organisms/search$', 'SearchOrganisms.Application.renderAction')
 )
+'''
 
 urlpatterns += patterns('taxon_home.views.applications.registered',
     url(r'^administration/$', 'Administration.Application.renderAction'),
