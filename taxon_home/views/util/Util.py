@@ -40,7 +40,7 @@ def getFilterByDate(dateString, paramName):
     action_dates = [item.strip() for item in dateString.split(':', 1)]
     
     action = action_dates[0]
-    dates = action_dates[1] if len(action_dates) > 1 else action
+    dates = action_dates[1] if len(action_dates) > 1 else ''
     
     try:
         if action == 'after':
@@ -53,7 +53,7 @@ def getFilterByDate(dateString, paramName):
                 dates[i] = parseDate(date)
             return { paramName + '__range' : dates }
         else: # on keyword or no keyword
-            date = parseDate(action + ':' + dates)
+            date = parseDate(action + ':' + dates if dates else action)
             return {
                 paramName + '__year' : date.year,
                 paramName + '__month' : date.month,
