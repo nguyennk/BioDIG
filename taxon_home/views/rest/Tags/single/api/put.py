@@ -1,45 +1,46 @@
 import taxon_home.views.util.ErrorConstants as Errors
-from taxon_home.models import Picture, TagGroup
+from taxon_home.models import TagGroup
 from django.core.exceptions import ObjectDoesNotExist
 from renderEngine.WebServiceObject import WebServiceObject
 from django.db import transaction, DatabaseError
 
-class PostAPI:
+class PutAPI:
     
-    def __init__(self, user, fields=None):
+    def __init__(self, user=None, fields=None):
         self.user = user
         self.fields = fields
         
     '''
-        Creates a new tag with the given parameters
+        Updates the given key with the update parameters
         
-        @param imageKey: The key for the image to which this tag group belongs
-        @param name: The description for this tag
+        @param tagKey: The tag's key to update or the tag itself
+        @param updateParams: A dictionary of the new parameters for the tag to be changed
+        @isKey: Indicates whether the input tagKey is actually a key or not
     '''
     @transaction.commit_on_success 
-    def createTagGroup(self, imageKey, name, isKey=True):
+    def updateTagGroup(self, tagGroupKey, name=None, isKey=True):
         metadata = WebServiceObject()
-        
         try:
-            if isKey:
-                image = Picture.objects.get(pk__exact=imageKey)
+            if (isKey):
+                tagGroup = TagGroup.objects.get(pk__exact=tagGroupKey)
             else:
-                image = imageKey
+                tagGroup = tagGroupKey
         except (ObjectDoesNotExist, ValueError):
-            raise Errors.INVALID_IMAGE_KEY
+            raise Errors.INVALID_TAG_GROUP_KEY
         
-        if not image.writePermissions(self.user):
+        if not tagGroup.writePermissions(self.user):
             raise Errors.AUTHENTICATION
         
-        # start saving the new tag now that it has passed all tests
-        tagGroup = TagGroup(name=name, picture=image, user=self.user)
+        # update the name
+        if name:
+            tagGroup.name = name
+        
+        metadata.limitFields(self.fields)
         try:
             tagGroup.save()
         except DatabaseError as e:
             transaction.rollback()
             raise Errors.INTEGRITY_ERROR.setCustom(str(e))
-        # limit metadata return
-        metadata.limitFields(self.fields)
         
         # add new tag to response for success
         metadata.put('id', tagGroup.pk)
@@ -47,9 +48,7 @@ class PostAPI:
         metadata.put('user', tagGroup.user.username)
         metadata.put('dateCreated', tagGroup.dateCreated.strftime("%Y-%m-%d %H:%M:%S"))
         metadata.put('lastModified', tagGroup.lastModified.strftime("%Y-%m-%d %H:%M:%S"))
-        metadata.put('image', tagGroup.picture.pk)
+        metadata.put('imageId', tagGroup.picture.pk)
         metadata.put('isPrivate', tagGroup.isPrivate)
         
         return metadata
-        
-        
