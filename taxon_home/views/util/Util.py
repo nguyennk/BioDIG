@@ -44,16 +44,21 @@ def getFilterByDate(dateString, paramName):
     
     try:
         if action == 'after':
-            return paramName + '__gt', parseDate(dates)
+            return { paramName + '__gt' : parseDate(dates) }
         elif action == 'before':
-            return paramName + '__lt', parseDate(dates)
+            return { paramName + '__lt' : parseDate(dates) }
         elif action == 'range':
             dates = [item.strip() for item in dates.split(',', 1)]
             for i, date in enumerate(dates):
                 dates[i] = parseDate(date)
-            return paramName + '__range', dates
+            return { paramName + '__range' : dates }
         else: # on keyword or no keyword
-            return paramName, parseDate(action + ':' + dates)
+            date = parseDate(action + ':' + dates)
+            return {
+                paramName + '__year' : date.year,
+                paramName + '__month' : date.month,
+                paramName + '__day' : date.day
+            }
     except ValueError:
         raise Errors.INVALID_SYNTAX.setCustom(paramName)
     

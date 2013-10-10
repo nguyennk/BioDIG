@@ -37,12 +37,12 @@ class GetAPI:
         if user: query = query.filter(user__pk__in=user)
             
         if lastModified:
-            key, arg = Util.getFilterByDate(lastModified, 'lastModified')
-            query = query.filter(**{ key : arg })
+            keyArgs = Util.getFilterByDate(lastModified, 'lastModified')
+            query = query.filter(**keyArgs)
             
         if dateCreated:
-            key, arg = Util.getFilterByDate(dateCreated, 'dateCreated')
-            query = query.filter(**{ key : arg })
+            keyArgs = Util.getFilterByDate(dateCreated, 'dateCreated')
+            query = query.filter(**keyArgs)
             
         if self.unlimited:
             query = query[self.offset:]
