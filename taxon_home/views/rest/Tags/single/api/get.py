@@ -1,5 +1,5 @@
 import taxon_home.views.util.ErrorConstants as Errors
-from taxon_home.models import TagGroup
+from taxon_home.models import Tag, TagPoint
 from django.core.exceptions import ObjectDoesNotExist
 from renderEngine.WebServiceObject import WebServiceObject
 
@@ -12,30 +12,39 @@ class GetAPI:
     '''
         Gets all the tags in the database that are private
     '''
-    def getTagGroup(self, tagGroupKey, isKey=True):
+    def getTag(self, tagKey, isKey=True):
         metadata = WebServiceObject()
         
         try:            
             if (isKey):
-                tagGroup = TagGroup.objects.get(pk__exact=tagGroupKey)
+                tag = Tag.objects.get(pk__exact=tagKey)
             else:
-                tagGroup = tagGroupKey
+                tag = tagKey
         except (ObjectDoesNotExist, ValueError):
-            raise Errors.INVALID_TAG_GROUP_KEY
+            raise Errors.INVALID_TAG_KEY
         except Exception:
             raise Errors.INTERNAL_ERROR
-        
-        if not tagGroup.readPermissions(self.user):
+            
+        if not tag.readPermissions(self.user):
             raise Errors.AUTHENTICATION
-
+        
         metadata.limitFields(self.fields)
-                
-        metadata.put('id', tagGroup.pk)
-        metadata.put('name', tagGroup.name)
-        metadata.put('user', tagGroup.user.username)
-        metadata.put('dateCreated', tagGroup.dateCreated.strftime("%Y-%m-%d %H:%M:%S"))
-        metadata.put('lastModified', tagGroup.lastModified.strftime("%Y-%m-%d %H:%M:%S"))
-        metadata.put('imageId', tagGroup.picture.pk)
-        metadata.put('isPrivate', tagGroup.isPrivate)
+        
+        if metadata.allowsField('points'):
+            tagPoints = TagPoint.objects.filter(tag__exact=tag)
+            
+            points = []
+            
+            for tagPoint in tagPoints:
+                points.append({
+                    'x' : tagPoint.pointX, 
+                    'y' : tagPoint.pointY
+                })
+            
+            metadata.put('points', points)
+        
+        metadata.put('id', tag.pk)
+        metadata.put('color', [tag.color.red, tag.color.green, tag.color.blue])
+        metadata.put('name', tag.name)
         
         return metadata

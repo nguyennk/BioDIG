@@ -1,5 +1,5 @@
 import taxon_home.views.util.ErrorConstants as Errors
-from taxon_home.models import TagGroup
+from taxon_home.models import Tag, TagPoint, TagColor
 from django.core.exceptions import ObjectDoesNotExist
 from renderEngine.WebServiceObject import WebServiceObject
 from django.db import transaction, DatabaseError
@@ -16,39 +16,77 @@ class PutAPI:
         @param tagKey: The tag's key to update or the tag itself
         @param updateParams: A dictionary of the new parameters for the tag to be changed
         @isKey: Indicates whether the input tagKey is actually a key or not
-    '''
+    '''    
     @transaction.commit_on_success 
-    def updateTagGroup(self, tagGroupKey, name=None, isKey=True):
+    def updateTag(self, tagKey, points=None, name=None, color=None, isKey=True):
         metadata = WebServiceObject()
         try:
             if (isKey):
-                tagGroup = TagGroup.objects.get(pk__exact=tagGroupKey)
+                tag = Tag.objects.get(pk__exact=tagKey)
             else:
-                tagGroup = tagGroupKey
+                tag = tagKey
         except (ObjectDoesNotExist, ValueError):
-            raise Errors.INVALID_TAG_GROUP_KEY
-        
-        if not tagGroup.writePermissions(self.user):
+            raise Errors.INVALID_TAG_KEY
+
+        if not tag.writePermissions(self.user):
             raise Errors.AUTHENTICATION
         
-        # update the name
+        # update the description
         if name:
-            tagGroup.name = name
+            tag.name = name
+        
+        # update the color (ignores bad syntax)
+        try:
+            if color and len(color) == 3:
+                tagColor = TagColor.objects.get_or_create(red=color[0], green=color[1], blue=color[2])[0]
+                tag.color = tagColor
+        except (ValueError, TypeError):
+            raise Errors.INVALID_SYNTAX.setCustom('color')
+        
+        oldTagPoints = list(TagPoint.objects.filter(tag__exact=tag))
+        
+        # updates the tag points for this tag
+        if points:
+            # first we delete the old tag points (they aren't helpful anymore)
+            # TODO: add Trash database for restoring accidental changes                    
+            try:
+                newTagPointModels = []
+                # Save the new tag points
+                # create the new tag points to put in the tag
+                for counter, point in enumerate(points):
+                    newTagPointModels.append(TagPoint(pointX=float(point['x']), pointY=float(point['y']) , rank=counter+1))
+                    
+            except (TypeError, KeyError, ValueError):
+                raise Errors.INVALID_SYNTAX.setCustom('points')
         
         metadata.limitFields(self.fields)
         try:
-            tagGroup.save()
+            tag.save()
+            if points:
+                for newTagPoint in newTagPointModels:
+                    newTagPoint.tag = tag
+                    newTagPoint.save()
+                
+                for tagPoint in oldTagPoints:
+                    tagPoint.delete()
+                
+                metadata.put('points', points)
+            else:
+                tagPoints = []
+                for tagPoint in oldTagPoints:
+                    tagPoints.append({
+                        'x' : tagPoint.pointX, 
+                        'y' : tagPoint.pointY
+                    })
+                metadata.put('points', tagPoints)
         except DatabaseError as e:
             transaction.rollback()
             raise Errors.INTEGRITY_ERROR.setCustom(str(e))
         
         # add new tag to response for success
-        metadata.put('id', tagGroup.pk)
-        metadata.put('name', tagGroup.name)
-        metadata.put('user', tagGroup.user.username)
-        metadata.put('dateCreated', tagGroup.dateCreated.strftime("%Y-%m-%d %H:%M:%S"))
-        metadata.put('lastModified', tagGroup.lastModified.strftime("%Y-%m-%d %H:%M:%S"))
-        metadata.put('imageId', tagGroup.picture.pk)
-        metadata.put('isPrivate', tagGroup.isPrivate)
+        metadata.put('id', tag.pk)
+        metadata.put('user', tag.user)
+        metadata.put('color', [tag.color.red, tag.color.green, tag.color.blue])
+        metadata.put('name', tag.name)
         
         return metadata

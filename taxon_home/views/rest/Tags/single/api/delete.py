@@ -1,5 +1,5 @@
 import taxon_home.views.util.ErrorConstants as Errors
-from taxon_home.models import TagGroup
+from taxon_home.models import Tag, TagPoint
 from django.core.exceptions import ObjectDoesNotExist
 from renderEngine.WebServiceObject import WebServiceObject
 from django.db import transaction, DatabaseError
@@ -14,35 +14,43 @@ class DeleteAPI:
         Gets all the tags in the database that are private
     '''
     @transaction.commit_on_success 
-    def deleteTagGroup(self, tagGroupKey, isKey=True):
+    def deleteTag(self, tagKey, isKey=True):
         metadata = WebServiceObject()
         
-        try:
+        try:            
             if (isKey):
-                tagGroup = TagGroup.objects.get(pk__exact=tagGroupKey)
+                tag = Tag.objects.get(pk__exact=tagKey)
             else:
-                tagGroup = tagGroupKey
+                tag = tagKey
         except (ObjectDoesNotExist, ValueError):
-            raise Errors.INVALID_TAG_GROUP_KEY
+            raise Errors.INVALID_GENE_LINK_KEY
         except Exception:
             raise Errors.INTERNAL_ERROR
-        
-        if not tagGroup.writePermissions(self.user):
+            
+        if not tag.writePermissions(self.user):
             raise Errors.AUTHENTICATION
         
         metadata.limitFields(self.fields)
-                
-        # add new tag to response for success
-        metadata.put('id', tagGroup.pk)
-        metadata.put('name', tagGroup.name)
-        metadata.put('dateCreated', tagGroup.dateCreated.strftime("%Y-%m-%d %H:%M:%S"))
-        metadata.put('lastModified', tagGroup.lastModified.strftime("%Y-%m-%d %H:%M:%S"))
-        metadata.put('imageId', tagGroup.picture.pk)
+        
+        if metadata.allowsField('points'):
+            tagPoints = TagPoint.objects.filter(tag__exact=tag)
+            
+            points = []
+            
+            for tagPoint in tagPoints:
+                points.append({
+                    'x' : tagPoint.pointX, 
+                    'y' : tagPoint.pointY
+                })
+            
+            metadata.put('points', points)
+        
+        metadata.put('id', tag.pk)
+        metadata.put('color', [tag.color.red, tag.color.green, tag.color.blue])
+        metadata.put('name', tag.name)
         
         try:
-            tagGroup.delete()
+            tag.delete()
         except DatabaseError as e:
             transaction.rollback()
             raise Errors.INTEGRITY_ERROR.setCustom(str(e))
-        
-        return metadata
