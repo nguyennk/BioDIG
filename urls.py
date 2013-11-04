@@ -25,6 +25,10 @@ urlpatterns = patterns('taxon_home.views.applications.public',
     url(r'^advancedSearch/$', 'AdvancedSearch.Application.renderAction')
 )
 
+urlpatterns += patterns('',
+    url(r'^api/docs/', include('rest_framework_swagger.urls'))
+)
+
 urlpatterns += patterns('taxon_home.views.rest',
     # Tag Group API Urls
     url(r'^api/tagGroups$', 'TagGroups.multiple.Application.renderAction'),
