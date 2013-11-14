@@ -4,34 +4,31 @@ from django.core.exceptions import ObjectDoesNotExist
 from renderEngine.WebServiceObject import WebServiceObject
 from django.db import transaction, DatabaseError
 
-class DeleteAPI:
+class PostAPI:
     
-    def __init__(self, user=None, fields=None):
+    def __init__(self, user, fields=None):
         self.user = user
         self.fields = fields
-    
+        
     '''
-        Gets all the tags in the database that are private
+        Creates a new tag with the given parameters
+        
+        @param name: The description for this tag
     '''
     @transaction.commit_on_success 
-    def deleteTag(self, tagKey, isKey=True):
+    def createTag(self, name, isKey=True):
         metadata = WebServiceObject()
         
+        # start saving the new tag now that it has passed all tests
+        tag = Tag(name=name, user=self.user)
         try:
-            if (isKey):
-                tag = Tag.objects.get(pk__exact=tagKey)
-            else:
-                tag = tagKey
-        except (ObjectDoesNotExist, ValueError):
-            raise Errors.INVALID_TAG_GROUP_KEY
-        except Exception:
-            raise Errors.INTERNAL_ERROR
-        
-        if not tag.writePermissions(self.user):
-            raise Errors.AUTHENTICATION
-        
+            tag.save()
+        except DatabaseError as e:
+            transaction.rollback()
+            raise Errors.INTEGRITY_ERROR.setCustom(str(e))
+        # limit metadata return
         metadata.limitFields(self.fields)
-                
+        
         # add new tag to response for success
         metadata.put('name', tag.name)
         metadata.put('color', tag.color)
@@ -41,10 +38,6 @@ class DeleteAPI:
         metadata.put('user', tag.user)
         metadata.put('isPrivate', tag.isPrivate)
         
-        try:
-            tag.delete()
-        except DatabaseError as e:
-            transaction.rollback()
-            raise Errors.INTEGRITY_ERROR.setCustom(str(e))
-        
         return metadata
+        
+        

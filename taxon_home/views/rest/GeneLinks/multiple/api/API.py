@@ -8,7 +8,7 @@ from post import PostAPI
     
     @param request: Django Request object to be used to parse the query
 '''
-def getTags(request):
+def getTagGroups(request):
     # read in optional parameters and initialize the API
     offset = Util.getInt(request.GET, 'offset', 0)
     limit = Util.getInt(request.GET, 'limit', 10)
@@ -33,7 +33,7 @@ def getTags(request):
     
     @param request: Django Request object to be used to parse the query
 '''
-def createTag(request):
+def createTagGroup(request):
     imageKey = request.POST.get('imageId', None)
     if not imageKey:
         raise Errors.MISSING_PARAMETER.setCustom('imageId')

@@ -1,5 +1,5 @@
 import taxon_home.views.util.ErrorConstants as Errors
-from taxon_home.models import Tag
+from taxon_home.models import Organism
 from django.core.exceptions import ObjectDoesNotExist
 from renderEngine.WebServiceObject import WebServiceObject
 
@@ -10,32 +10,31 @@ class GetAPI:
         self.fields = fields
     
     '''
-        Gets all the tags in the database that are private
+        Gets all the Organisms in the database that are private
     '''
-    def getTag(self, tagKey, isKey=True):
+    def getOrganism(self, organismKey, isKey=True):
         metadata = WebServiceObject()
         
         try:            
             if (isKey):
-                tag = Tag.objects.get(pk__exact=tagKey)
+                organism = Organism.objects.get(pk__exact=organismKey)
             else:
-                tag = tagKey
+                organism = organismKey
         except (ObjectDoesNotExist, ValueError):
             raise Errors.INVALID_TAG_GROUP_KEY
         except Exception:
             raise Errors.INTERNAL_ERROR
         
-        if not tag.readPermissions(self.user):
+        if not organism.readPermissions(self.user):
             raise Errors.AUTHENTICATION
 
         metadata.limitFields(self.fields)
                 
-        metadata.put('name', tag.name)
-        metadata.put('color', tag.color)
-        metadata.put('group', tag.group)
-        metadata.put('dateCreated', tag.dateCreated.strftime("%Y-%m-%d %H:%M:%S"))
-        metadata.put('lastModified', tag.lastModified.strftime("%Y-%m-%d %H:%M:%S"))
-        metadata.put('user', tag.user)
-        metadata.put('isPrivate', tag.isPrivate)
+        metadata.put('organism_id', organism.pk)
+        metadata.put('abbreviation', organism.abbreviation)
+        metadata.put('genus', organism.genus)
+        metadata.put('species', organism.species)
+        metadata.put('common_name', organism.name)
+        metadata.put('comment', organism.comment)
         
         return metadata

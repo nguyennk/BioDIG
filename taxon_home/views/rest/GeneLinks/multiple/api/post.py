@@ -17,13 +17,24 @@ class PostAPI:
         @param name: The description for this tag
     '''
     @transaction.commit_on_success 
-    def createTag(self, name, isKey=True):
+    def createTagGroup(self, imageKey, name, isKey=True):
         metadata = WebServiceObject()
         
-        # start saving the new tag now that it has passed all tests
-        tag = Tag(name=name, user=self.user)
         try:
-            tag.save()
+            if isKey:
+                image = Picture.objects.get(pk__exact=imageKey)
+            else:
+                image = imageKey
+        except (ObjectDoesNotExist, ValueError):
+            raise Errors.INVALID_IMAGE_KEY
+        
+        if not image.writePermissions(self.user):
+            raise Errors.AUTHENTICATION
+        
+        # start saving the new tag now that it has passed all tests
+        tagGroup = TagGroup(name=name, picture=image, user=self.user)
+        try:
+            tagGroup.save()
         except DatabaseError as e:
             transaction.rollback()
             raise Errors.INTEGRITY_ERROR.setCustom(str(e))
@@ -31,13 +42,13 @@ class PostAPI:
         metadata.limitFields(self.fields)
         
         # add new tag to response for success
-        metadata.put('id', tag.pk)
-        metadata.put('name', tag.name)
-        metadata.put('user', tag.user.username)
-        metadata.put('dateCreated', tag.dateCreated.strftime("%Y-%m-%d %H:%M:%S"))
-        metadata.put('lastModified', tag.lastModified.strftime("%Y-%m-%d %H:%M:%S"))
-        metadata.put('image', tag.picture.pk)
-        metadata.put('isPrivate', tag.isPrivate)
+        metadata.put('id', tagGroup.pk)
+        metadata.put('name', tagGroup.name)
+        metadata.put('user', tagGroup.user.username)
+        metadata.put('dateCreated', tagGroup.dateCreated.strftime("%Y-%m-%d %H:%M:%S"))
+        metadata.put('lastModified', tagGroup.lastModified.strftime("%Y-%m-%d %H:%M:%S"))
+        metadata.put('image', tagGroup.picture.pk)
+        metadata.put('isPrivate', tagGroup.isPrivate)
         
         return metadata
         
