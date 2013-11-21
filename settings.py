@@ -120,7 +120,7 @@ TEMPLATE_DIRS = (
     '/var/www/BioDIG/taxon_home/templates',
 )
 
-INSTALLED_APPS = (
+INSTALLED_APPS = (t
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
